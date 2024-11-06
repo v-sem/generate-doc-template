@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option go_package = "microservice-template/greeter";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "/api/v1/greeter/say-hello"
+      body: "*"
+    };
+  }
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  message Item {
+    int64 sku = 1 [(validate.rules).int64.gt=0, (validate.rules).int64.lte=1000]; // SKU
+  }
+  float num1float = 1 [(validate.rules).float.const=3.14, (validate.rules).float.lte=3.14];   // terts
+  int64 num1int64 = 2 [(validate.rules).int64.in=1, (validate.rules).int64.in=2];   // terts
+  bool name2 = 3 [(validate.rules).bool.const=false];  // terts
+  string aame2a = 4 [(validate.rules).string.const="1234", (validate.rules).string.in="1234", (validate.rules).string.in="1234", (validate.rules).string.min_bytes=12, (validate.rules).string.email=false]; // terts
+  repeated Item items = 5 [(validate.rules).repeated.max_items=100, (validate.rules).repeated.items.int64.gt=4];
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1; //teert
+}

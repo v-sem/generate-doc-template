@@ -1,0 +1,230 @@
+{{- /* Шаблон для вывода HTTP-метода и адреса */ -}}
+{{- define "http_options" -}}
+  {{- with (index .Options "google.api.http").Rules -}}
+    {{- range . -}}
+      {{- .Method }} {{ .Pattern -}}
+    {{- end -}}
+  {{- else -}}
+    —
+  {{- end -}}
+{{- end -}}
+
+{{- /* Шаблоны для вывода валидаций поля */ -}}
+{{- define "ValidationsConst" -}}
+    {{- with .Const }}- Значение должно быть точно равно: {{ toJson . }}<br>{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsInAndNotIn" -}}
+    {{- with .In }}- Значение должно быть одним из следующих: {{ toJson . }}<br>{{ end -}}
+    {{- with .NotIn }}- Значение не должно быть любым из следующих: {{ toJson . }}<br>{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsGteAndLte" -}}
+    {{- with .Gt }}- Значение должно быть больше {{ . }}<br>{{ end -}}
+    {{- with .Gte }}- Значение должно быть больше или равно {{ . }}<br>{{ end -}}
+    {{- with .Lt }}- Значение должно быть меньше {{ . }}<br>{{ end -}}
+    {{- with .Lte }}- Значение должно быть меньше или равно {{ . }}<br>{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsIgnoreEmpty" -}}
+    {{- /* with .IgnoreEmpty }}- Игнорировать пустое значение<br>{{ end */ -}}
+{{- end -}}
+
+{{- define "ValidationsNumberRules" -}}
+    {{- template "ValidationsConst" . -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+    {{- template "ValidationsGteAndLte" . -}}
+    {{- template "ValidationsIgnoreEmpty" . -}}
+{{- end -}}
+
+{{- define "ValidationsBoolRules" -}}
+    {{- template "ValidationsConst" . -}}
+{{- end -}}
+
+{{- define "ValidationsStringRules" -}}
+    {{- template "ValidationsConst" . -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+    {{- with .Len }}- Строка должна быть длиной ровно {{ . }} символов<br>{{ end -}}
+    {{- with .MinLen }}- Строка должна быть длиной не менее {{ . }} символов<br>{{ end -}}
+    {{- with .MaxLen }}- Строка должна быть длиной не более {{ . }} символов<br>{{ end -}}
+    {{- with .LenBytes }}- Строка должна содержать ровно {{ . }} байт<br>{{ end -}}
+    {{- with .MinBytes }}- Строка должна содержать не менее {{ . }} байт<br>{{ end -}}
+    {{- with .MaxBytes }}- Строка должна содержать не более {{ . }} байт<br>{{ end -}}
+    {{- with .Pattern }}- Строка должна соответствовать регулярному выражению "{{ . }}"<br>{{ end -}}
+    {{- with .Prefix }}- Строка должна начинаться с подстроки "{{ . }}"<br>{{ end -}}
+    {{- with .Suffix }}- Строка должна заканчиваться подстрокой "{{ . }}"<br>{{ end -}}
+    {{- with .Contains }}- Строка должна содержать подстроку "{{ . }}"<br>{{ end -}}
+    {{- with .NotContains }}- Строка не должна содержать подстроку "{{ . }}"<br>{{ end -}}
+    {{- with .WellKnown -}}
+        {{- if (typeIs "*validate.StringRules_Email" . ) }}{{ if .Email }}- Строка должна быть действительным адресом электронной почты<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Hostname" . ) }}{{ if .Hostname }}- Строка должна быть действительным именем хоста<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Ip" . ) }}{{ if .Ip }}- Строка должна быть действительным IP-адресом<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Ipv4" . ) }}{{ if .Ipv4 }}- Строка должна быть действительным адресом IPv4<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Ipv6" . ) }}{{ if .Ipv6 }}- Строка должна быть действительным адресом IPv6<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Uri" . ) }}{{ if .Uri }}- Строка должна быть действительным URI<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_UriRef" . ) }}{{ if .UriRef }}- Строка должна быть URI-ссылкой<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Address" . ) }}{{ if .Address }}- Строка должна быть действительным сетевым адресом<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_Uuid" . ) }}{{ if .Uuid }}- Строка должна быть действительным UUID<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.StringRules_WellKnownRegex" . ) }}{{ if .WellKnownRegex }}- Строка должна соответствовать предопределенному регулярному выражению: "{{ . }}"<br>{{ end }}{{ end -}}
+      {{- end -}}
+{{- end -}}
+
+{{- define "ValidationsBytesRules" -}}
+  {{- template "ValidationsConst" . -}}
+  {{- with .Len }}- Точная длина в байтах: {{ . }}<br>{{ end -}}
+  {{- with .MinLen }}- Минимальная длина в байтах: {{ . }}<br>{{ end -}}
+  {{- with .MaxLen }}- Максимальная длина в байтах: {{ . }}<br>{{ end -}}
+  {{- with .Pattern }}- Значение должно соответствовать регулярному выражению: {{ . }}<br>{{ end -}}
+  {{- with .Prefix }}- Значение должно начинаться с: {{ . }}<br>{{ end -}}
+  {{- with .Suffix }}- Значение должно заканчиваться на: {{ . }}<br>{{ end -}}
+  {{- with .Contains }}- Значение должно содержать: {{ . }}<br>{{ end -}}
+  {{- template "ValidationsInAndNotIn" . -}}
+  {{- with .WellKnown }}
+        {{- if (typeIs "*validate.BytesRules_Ip" . ) }}{{ if .Ip }}- Значение должно быть действительным IP-адресом<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.BytesRules_Ipv4" . ) }}{{ if .Ipv4 }}- Значение должно быть действительным адресом IPv4<br>{{ end }}{{ end -}}
+        {{- if (typeIs "*validate.BytesRules_Ipv6" . ) }}{{ if .Ipv6 }}- Значение должно быть действительным адресом IPv6<br>{{ end }}{{ end -}}
+  {{- end }}
+  {{- template "ValidationsIgnoreEmpty" . -}}
+{{- end -}}
+
+{{- define "ValidationsEnumRules" -}}
+    {{- template "ValidationsConst" . -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+    {{- with .DefinedOnly }}{{ if . }}- Разрешены только объявленные значения<br>{{ end }}{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsRepeatedRules" -}}
+  {{- with .MinItems }}- Минимальное количество элементов: {{ . }}<br>{{ end -}}
+  {{- with .MaxItems }}- Максимальное количество элементов: {{ . }}<br>{{ end -}}
+  {{- with .Unique }}{{ if . }}- Элементы должны быть уникальными<br>{{ end }}{{ end -}}
+  {{- template "ValidationsIgnoreEmpty" . -}}
+  {{- with .Items }}Правила для элементов:<br>{{- template "ValidationsFieldRules" . -}}{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsMapRules" -}}
+  {{- with .MinPairs }}- Минимальное количество пар ключ-значение: {{ . }}<br>{{ end -}}
+  {{- with .MaxPairs }}- Максимальное количество пар ключ-значение: {{ . }}<br>{{ end -}}
+  {{- with .NoSparse }}{{ if . }}- Запрещены разреженные карты<br>{{ end }}{{ end -}}
+  {{- template "ValidationsIgnoreEmpty" . -}}
+  {{- with .Keys }}Правила для ключей:<br>{{- template "ValidationsFieldRules" . -}}{{ end -}}
+  {{- with .Values }}Правила для значений:<br>{{- template "ValidationsFieldRules" . -}}{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsAnyRules" -}}
+    {{- with .Required }}{{ if . }}- Значение обязательно<br>{{ end }}{{ end -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+{{- end -}}
+
+{{- define "ValidationsDurationRules" -}}
+    {{- with .Required }}{{ if . }}- Значение обязательно<br>{{ end }}{{ end -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+    {{- template "ValidationsGteAndLte" . -}}
+    {{- template "ValidationsInAndNotIn" . -}}
+{{- end -}}
+
+{{- define "ValidationsTimestampRules" -}}
+	{{- with .Required }}{{ if . }}- Значение обязательно<br>{{ end }}{{ end -}}
+    {{- template "ValidationsConst" . -}}
+	{{- template "ValidationsGteAndLte" . -}}
+	{{- with .GtNow }}{{ if . }}- Значение должно быть больше текущего времени<br>{{ end }}{{ end -}}
+    {{- with .LtNow }}{{ if . }}- Значение должно быть меньше текущего времени<br>{{ end }}{{ end -}}
+    {{- with .Within }}- Значение должно быть в пределах длительности {{ toJson . }} от текущего времени<br>{{ end -}}
+{{- end -}}
+
+{{- define "ValidationsFieldRules" -}}
+    {{- with .Message -}}
+        {{- with .Skip }}{{ if . }}- Пропустить проверку этого сообщения<br>{{ end }}{{ end -}}
+        {{- with .Required }}{{ if . }}- Сообщение является обязательным<br>{{ end }}{{ end -}}
+    {{- end -}}
+    {{- with .Type -}}
+        {{- if (typeIs "*validate.FieldRules_Float" . ) }}{{ template "ValidationsNumberRules" .Float }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Double" . ) }}{{ template "ValidationsNumberRules" .Double }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Int32" . ) }}{{ template "ValidationsNumberRules" .Int32 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Int64" . ) }}{{ template "ValidationsNumberRules" .Int64 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Uint32" . ) }}{{ template "ValidationsNumberRules" .Uint32 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Uint64" . ) }}{{ template "ValidationsNumberRules" .Uint64 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Sint32" . ) }}{{ template "ValidationsNumberRules" .Sint32 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Sint64" . ) }}{{ template "ValidationsNumberRules" .Sint64 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Fixed32" . ) }}{{ template "ValidationsNumberRules" .Fixed32 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Fixed64" . ) }}{{ template "ValidationsNumberRules" .Fixed64 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Sfixed32" . ) }}{{ template "ValidationsNumberRules" .Sfixed32 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Sfixed64" . ) }}{{ template "ValidationsNumberRules" .Sfixed64 }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Bool" . ) }}{{ template "ValidationsBoolRules" .Bool }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_String_" . ) }}{{ template "ValidationsStringRules" .String_ }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Bytes" . ) }}{{ template "ValidationsBytesRules" .Bytes }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Enum" . ) }}{{ template "ValidationsEnumRules" .Enum }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Repeated" . ) }}{{ template "ValidationsRepeatedRules" .Repeated }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Map" . ) }}{{ template "ValidationsMapRules" .Map }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Any" . ) }}{{ template "ValidationsAnyRules" .Any }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Duration" . ) }}{{ template "ValidationsDurationRules" .Duration }}{{ end -}}
+        {{- if (typeIs "*validate.FieldRules_Timestamp" . ) }}{{ template "ValidationsTimestampRules" .Timestamp }}{{ end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "Validations" -}}
+    {{- with (index .Options "validate.rules").FieldRules -}}
+        {{- template "ValidationsFieldRules" . -}}
+    {{- else -}}
+        —
+    {{- end -}}
+{{- end -}}
+
+{{- /* Шаблон для вывода полей сообщения в табличном виде */ -}}
+{{- define "MessageFields" }}
+
+|#| Параметр | Тип | Описание | Валидации |
+|-|----------|-----|----------|-----------|
+{{- range $i, $f := .Fields }}
+|{{ add $i 1 }}| **{{ .Name }}** | {{ if eq .Label "repeated" }}[]{{end}}{{ .Type }} | {{ .Description | default "—" }} | {{ template "Validations" . }} |
+{{- end }}
+
+{{ end -}}
+
+{{- /* Шаблон для вывода сообщений запроса */ -}}
+{{- define "MessageRequest" -}}
+    {{- $name := .RequestType -}}
+    {{- range .Messages -}}
+        {{- if hasPrefix $name .LongName -}}
+            {{- if eq $name .LongName}}#####{{else}}######{{end}} {{ .Name -}}
+            {{- "\n" -}}
+            {{- .Description -}}
+            {{- template "MessageFields" . -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- /* Шаблон для вывода сообщений ответа */ -}}
+{{- define "MessageResponse" -}}
+    {{- $name := .ResponseType -}}
+    {{- range .Messages -}}
+        {{- if hasPrefix $name .LongName -}}
+            {{- if eq $name .LongName}}#####{{else}}######{{end}} {{ .Name -}}
+            {{- "\n" -}}
+            {{- .Description -}}
+            {{- template "MessageFields" . -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- /* Основной шаблон */ -}}
+
+{{- range .Files -}}
+{{- $file := . -}}
+# {{ .Name -}}
+    {{- range.Services }}
+## {{.Name}}
+{{- range .Methods }}
+### Метод: {{.Name}} {{if ne .Description "" }}- {{end}}{{.Description}}
+   {{ template "http_options" . }}
+
+#### Запрос
+   {{ template "MessageRequest" dict "Messages" $file.Messages "RequestType" .RequestType}}
+
+#### Ответ
+   {{ template "MessageResponse" dict "Messages" $file.Messages "ResponseType" .ResponseType}}
+
+{{- end -}}
+
+{{- end -}}
+
+{{- end -}}
