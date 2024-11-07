@@ -1,5 +1,5 @@
 {{- /* Шаблон для вывода HTTP-метода и адреса */ -}}
-{{- define "http_options" -}}
+{{- define "HTTPOptions" -}}
   {{- with (index .Options "google.api.http").Rules -}}
     {{- range . -}}
       {{- .Method }} {{ .Pattern -}}
@@ -185,7 +185,7 @@
     {{- $name := .RequestType -}}
     {{- range .Messages -}}
         {{- if hasPrefix $name .LongName -}}
-            {{- if eq $name .LongName}}#####{{else}}######{{end}} {{ .Name -}}
+            {{- if eq $name .LongName}}###{{else}}####{{end}} {{ .Name -}}
             {{- "\n" -}}
             {{- .Description -}}
             {{- template "MessageFields" . -}}
@@ -198,7 +198,7 @@
     {{- $name := .ResponseType -}}
     {{- range .Messages -}}
         {{- if hasPrefix $name .LongName -}}
-            {{- if eq $name .LongName}}#####{{else}}######{{end}} {{ .Name -}}
+            {{- if eq $name .LongName}}###{{else}}####{{end}} {{ .Name -}}
             {{- "\n" -}}
             {{- .Description -}}
             {{- template "MessageFields" . -}}
@@ -210,21 +210,19 @@
 
 {{- range .Files -}}
 {{- $file := . -}}
-# {{ .Name -}}
-    {{- range.Services }}
-## {{.Name}}
-{{- range .Methods }}
-### Метод: {{.Name}} {{if ne .Description "" }}- {{end}}{{.Description}}
-   {{ template "http_options" . }}
+{{- range.Services -}}
+{{- $service := .Name -}}
+{{- range .Methods -}}
+--FILE:service_{{$service | lower}}_method_{{.Name | lower}}.md--
+# Метод: {{.Name}} {{if ne .Description "" }}- {{end}}{{.Description}}
+{{ template "HTTPOptions" . }}
 
-#### Запрос
-   {{ template "MessageRequest" dict "Messages" $file.Messages "RequestType" .RequestType}}
+## Запрос
+{{ template "MessageRequest" dict "Messages" $file.Messages "RequestType" .RequestType }}
 
-#### Ответ
-   {{ template "MessageResponse" dict "Messages" $file.Messages "ResponseType" .ResponseType}}
-
-{{- end -}}
+## Ответ
+{{ template "MessageResponse" dict "Messages" $file.Messages "ResponseType" .ResponseType }}
 
 {{- end -}}
-
+{{- end -}}
 {{- end -}}

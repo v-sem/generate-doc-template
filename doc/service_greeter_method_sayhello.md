@@ -1,4 +1,3 @@
---FILE:service_greeter_method_sayhello.md--
 # Метод: SayHello - Sends a greeting
 POST /api/v1/greeter/say-hello
 
